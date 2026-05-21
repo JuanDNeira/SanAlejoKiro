@@ -577,6 +577,410 @@ Plan de implementación incremental para San Alejo, una app móvil de organizaci
   - Ejecutar suite completa de tests: `npx jest --passWithNoTests`
   - Asegurarse de que todos los tests pasan; preguntar al usuario si hay dudas.
 
+- [ ] 26. Phase 5 — Visual Excellence: Nuevas dependencias y tokens de tema
+  - Instalar nuevas dependencias: `lottie-react-native`, `expo-blur`, `expo-linear-gradient`, `@expo-google-fonts/inter`, `expo-splash-screen`, `expo-image-manipulator`
+  - Crear `src/theme/gradients.ts` con: `brand: ['#6C63FF', '#FF6584']`, `brandOverlay`, `meshStops`, `vignette`, `cardBottom`, `shimmer`, `heatMapLow`, `heatMapHigh`
+  - Crear `src/theme/glassmorphism.ts` con `GlassmorphismLevel` type y `GlassmorphismLevels` record con los 4 niveles exactos (`ultra-light`, `light`, `medium`, `heavy`)
+  - Actualizar `src/theme/colors.ts` con paleta expandida: `primary`, `secondary`, `tertiary`, `success`, `warning`, `error` con variantes `light`/`dark`
+  - Actualizar `src/theme/typography.ts` con Inter Variable font, micro-typography settings (letter-spacing, line-height)
+  - Actualizar `src/theme/index.ts` para exportar los nuevos tokens
+  - Añadir campo `last_accessed_at` al schema SQLite en `src/database/schema.ts` y crear migración correspondiente
+  - _Requirements: 11.11, 11.12, 11.13, 11.14, 25.1, 26.1, 26.2_
+
+- [ ] 27. Phase 5 — Visual Excellence: Hooks de animación y utilidades visuales
+  - [ ] 27.1 Implementar `useDominantColor` hook
+    - Crear `src/hooks/useDominantColor.ts` que extrae el color dominante de una imagen URI mediante muestreo de píxeles
+    - Retornar string `#RRGGBB` o null si no hay imagen; usar fallback al `color_tag` si falla
+    - _Requirements: 24.1_
+
+  - [ ] 27.2 Implementar `useAnimatedCounter` hook
+    - Crear `src/hooks/useAnimatedCounter.ts` con Reanimated v3 SharedValue que anima de 0 a targetValue
+    - Usar easing `easeOutExpo`, duración configurable (default 800ms)
+    - _Requirements: 20.5, 21.6_
+
+  - [ ] 27.3 Implementar `useParallax` hook
+    - Crear `src/hooks/useParallax.ts` que retorna DerivedValue = scrollY * factor, limitado a headerHeight
+    - _Requirements: 18.1, 27.10_
+
+  - [ ]* 27.4 Escribir property tests para hooks visuales (Properties 19, 20)
+    - **Property 19: `useDominantColor` produce hex válido `#RRGGBB`**
+    - **Property 20: `useParallax` limita la traslación a headerHeight**
+    - **Validates: Requirements 24.1, 18.1, 27.10**
+    - _Archivo: `src/__tests__/properties/animations.property.test.ts`_
+
+- [ ] 28. Phase 5 — Visual Excellence: Componentes visuales nuevos
+  - [ ] 28.1 Implementar `AnimatedCounter`
+    - Crear `src/components/ui/AnimatedCounter.tsx` con props `value`, `duration`, `prefix`, `suffix`, `style`
+    - Usar `useAnimatedCounter` hook internamente
+    - _Requirements: 16.10, 20.5, 21.6_
+
+  - [ ] 28.2 Implementar `GradientBorder`, `GlowContainer`, `RibbonBadge`
+    - `GradientBorder`: usar `expo-linear-gradient` para renderizar borde como gradiente
+    - `GlowContainer`: aplicar box shadow con color y opacidad configurables
+    - `RibbonBadge`: ribbon diagonal en esquina superior derecha con brand gradient
+    - _Requirements: 11.17, 16.1, 19.5, 19.6_
+
+  - [ ] 28.3 Implementar `MeshGradientBackground`
+    - Crear `src/components/ui/MeshGradientBackground.tsx` con animación continua de 8s entre color stops
+    - Usar Reanimated v3 para interpolar colores
+    - _Requirements: 5.13, 20.8, 24.2_
+
+  - [ ] 28.4 Implementar `BlobTabIndicator`
+    - Crear `src/components/ui/BlobTabIndicator.tsx` con spring physics (damping 18, stiffness 350)
+    - Integrar en `BottomTabNavigator.tsx`
+    - _Requirements: 22.7, 22.8, 27.7_
+
+  - [ ] 28.5 Implementar `FABRadialMenu`
+    - Crear `src/components/ui/FABRadialMenu.tsx` con morph animation de 250ms, opciones en arco, máximo 4 opciones
+    - Integrar en el `FAB` existente mediante prop `radialMenu`
+    - _Requirements: 5.8, 22.1_
+
+  - [ ]* 28.6 Escribir property test para FABRadialMenu (Property 21)
+    - **Property 21: FABRadialMenu con N > 4 opciones renderiza exactamente 4**
+    - **Validates: Requirements 22.1**
+    - _Archivo: `src/__tests__/properties/animations.property.test.ts`_
+
+  - [ ]* 28.7 Escribir property test para Glassmorphism levels (Property 17)
+    - **Property 17: todos los niveles tienen valores dentro de rangos válidos**
+    - **Validates: Requirements 25.1**
+    - _Archivo: `src/__tests__/properties/theme.property.test.ts`_
+
+- [ ] 29. Phase 5 — Visual Excellence: PosterCard expandida y efectos visuales
+  - [ ] 29.1 Actualizar `PosterCard` con aspect ratio 2:3 y capas visuales
+    - Actualizar `src/components/ui/PosterCard.tsx` para renderizar con aspect ratio 2:3
+    - Implementar las 5 capas visuales: imagen/gradiente, gradiente inferior, glassmorphism ultra-light, vignette, texto+badge
+    - Añadir props `showRibbon`, `dominantColor`, `featured`
+    - _Requirements: 19.1, 19.2, 16.7_
+
+  - [ ] 29.2 Implementar tilt effect y shimmer on press en PosterCard
+    - Tilt effect: máximo 5 grados en X e Y basado en posición del toque, spring physics (damping 15, stiffness 300)
+    - Shimmer on press: sweep de 600ms al presionar y mantener
+    - Badge pulse animation al cambiar el conteo
+    - _Requirements: 19.3, 19.4, 19.7, 22.3, 16.8_
+
+  - [ ] 29.3 Implementar Vignette_Effect y Dominant_Color gradient en imágenes
+    - Aplicar vignette como radial gradient en PosterCard y Container Detail hero
+    - Usar `useDominantColor` para generar gradiente dinámico desde la imagen de cover
+    - _Requirements: 5.4, 24.1, 24.6_
+
+  - [ ]* 29.4 Escribir tests de ejemplo para PosterCard expandida
+    - Test: aspect ratio 2:3 correcto
+    - Test: RibbonBadge visible cuando `showRibbon=true`
+    - Test: Gradient_Border visible cuando `featured=true`
+    - _Archivo: `src/__tests__/components/PosterCard.test.tsx`_
+
+- [ ] 30. Phase 5 — Visual Excellence: Dashboard expandido (Hero, Carousel, Netflix rows)
+  - [ ] 30.1 Implementar `HeroCarousel`
+    - Crear `src/components/ui/HeroCarousel.tsx` con auto-play de 5s, crossfade de 800ms, pagination dots
+    - Integrar Parallax_Scroll en el hero usando `useParallax` (factor 0.6)
+    - _Requirements: 5.10, 18.1, 18.5, 20.1, 27.1_
+
+  - [ ] 30.2 Implementar secciones Netflix-style en Dashboard
+    - Añadir sección "Continuar organizando" con containers de la sesión actual
+    - Añadir sección "Recientes" con los 8 containers más recientes como fila horizontal
+    - Añadir sección "Por ubicación" con una fila por Location
+    - Implementar fade-out gradient en el borde derecho de cada fila (40px)
+    - _Requirements: 20.2, 20.3, 20.4, 24.8, 27.3_
+
+  - [ ] 30.3 Implementar navegación bar transparente y large title
+    - Implementar transición de nav bar de transparente a glassmorphism medium al hacer scroll
+    - Implementar large title que colapsa al hacer scroll (estilo iOS)
+    - _Requirements: 5.14, 20.7, 27.5_
+
+  - [ ] 30.4 Integrar MeshGradientBackground y mini activity chart en Dashboard
+    - Añadir `MeshGradientBackground` como fondo del Dashboard
+    - Implementar mini bar chart de actividad de los últimos 7 días con animación de entrada
+    - Añadir `AnimatedCounter` en el summary bar
+    - _Requirements: 5.3, 5.15, 20.5, 20.6, 20.8_
+
+  - [ ]* 30.5 Escribir tests de ejemplo para Dashboard expandido
+    - Test: HeroCarousel visible y rota automáticamente
+    - Test: sección "Recientes" visible con containers
+    - Test: nav bar se vuelve glassmorphism al hacer scroll
+    - _Archivo: `src/__tests__/components/DashboardScreen.test.tsx`_
+
+- [ ] 31. Phase 5 — Visual Excellence: Shared Element Transitions y animaciones de navegación
+  - [ ] 31.1 Implementar Shared_Element_Transition Dashboard → Container Detail
+    - Configurar transición de expansión de Card a pantalla completa (350ms, spring damping 20, stiffness 200)
+    - Implementar reverse transition al navegar hacia atrás
+    - _Requirements: 18.2, 18.6, 27.4_
+
+  - [ ] 31.2 Implementar blur transition entre pantallas
+    - Al navegar entre pantallas, aplicar blur de 0 a 10px en la pantalla saliente mientras la entrante hace fade-in (300ms total)
+    - _Requirements: 18.3_
+
+  - [ ] 31.3 Implementar Context_Menu_Preview (peek and pop)
+    - Al hacer long press en PosterCard, mostrar preview escalado del Container Detail con blur background
+    - _Requirements: 5.9, 27.6_
+
+  - [ ] 31.4 Implementar pull-to-refresh personalizado
+    - Reemplazar spinner del sistema con animación del logo de la app (rotación + pulso)
+    - _Requirements: 5.7, 22.4_
+
+  - [ ]* 31.5 Escribir tests de ejemplo para transiciones
+    - Test: Shared_Element_Transition se ejecuta al navegar a Container Detail
+    - Test: Context_Menu_Preview aparece al hacer long press
+    - _Archivo: `src/__tests__/components/NavigationTransitions.test.tsx`_
+
+- [ ] 32. Phase 5 — Visual Excellence: Microinteracciones y efectos de interacción
+  - [ ] 32.1 Implementar ripple effect en botones primarios
+    - Añadir ripple effect en `HapticButton` que se expande desde el punto de toque (400ms, 30% opacity)
+    - _Requirements: 22.2_
+
+  - [ ] 32.2 Implementar swipe actions con spring physics y color feedback
+    - Actualizar swipe-left en Items con spring physics (damping 20, stiffness 400)
+    - Añadir tint rojo para Delete y azul para Edit al revelar acciones
+    - _Requirements: 22.5_
+
+  - [ ] 32.3 Implementar Glow_Effect en elementos activos
+    - Aplicar `GlowContainer` en: Tag chips seleccionados, tab activo, inputs enfocados, Cards destacadas
+    - _Requirements: 11.15, 24.4_
+
+  - [ ] 32.4 Implementar Noise_Texture overlay en superficies glassmorphism
+    - Añadir textura de ruido al 3% de opacidad sobre todas las superficies glassmorphism
+    - _Requirements: 11.14, 24.3, 25.6_
+
+  - [ ]* 32.5 Escribir tests de ejemplo para microinteracciones
+    - Test: ripple effect se activa al presionar HapticButton
+    - Test: swipe-left muestra tint correcto para Delete y Edit
+    - _Archivo: `src/__tests__/components/Microinteractions.test.tsx`_
+
+- [ ] 33. Phase 5 — Visual Excellence: Glassmorphism expandido y Tab Bar
+  - [ ] 33.1 Actualizar Tab Bar con glassmorphism real y BlobTabIndicator
+    - Usar `expo-blur` con intensidad 80 en el Tab Bar
+    - Integrar `BlobTabIndicator` para el tab activo
+    - _Requirements: 12.1, 25.2, 27.7_
+
+  - [ ] 33.2 Actualizar BottomSheet con glassmorphism heavy y blur background
+    - Aplicar glassmorphism level `heavy` al BottomSheet
+    - Usar `expo-blur` con intensidad 60 para el fondo detrás del modal
+    - _Requirements: 25.3_
+
+  - [ ] 33.3 Implementar glassmorphism en navigation bar y floating cards
+    - Navigation bar: glassmorphism `medium` al hacer scroll
+    - Floating cards (Hero overlay, summary bar): glassmorphism `light` con colored shadow
+    - _Requirements: 25.4, 25.5_
+
+  - [ ]* 33.4 Escribir tests de ejemplo para glassmorphism
+    - Test: Tab Bar usa expo-blur
+    - Test: BottomSheet tiene glassmorphism heavy
+    - _Archivo: `src/__tests__/components/GlassmorphismComponents.test.tsx`_
+
+- [ ] 34. Phase 5 — Visual Excellence: Splash Screen animado y Loaders
+  - [ ] 34.1 Implementar Splash_Screen animado
+    - Configurar `expo-splash-screen` con animación de logo: scale-in (0.5 → 1.0) + fade-in de 600ms
+    - Transición a Dashboard/Onboarding con fade-out
+    - Completar en ≤ 1.5 segundos
+    - _Requirements: 23.3, 23.7_
+
+  - [ ] 34.2 Implementar custom spinner y progress indicator
+    - Reemplazar todos los spinners del sistema con spinner circular personalizado (accent color, trailing gradient, 800ms/rotación)
+    - Implementar progress bar con brand gradient para Export/Import
+    - _Requirements: 23.4, 23.5_
+
+  - [ ] 34.3 Actualizar EmptyState con Lottie animations
+    - Actualizar `EmptyState` para usar `lottie-react-native` con prop `lottieSource`
+    - Añadir assets Lottie para: empty containers, empty search results, empty items
+    - _Requirements: 5.2, 23.6, 16.11_
+
+  - [ ]* 34.4 Escribir tests de ejemplo para loaders
+    - Test: Splash_Screen se muestra al lanzar la app
+    - Test: EmptyState muestra Lottie animation
+    - Test: progress indicator visible durante export
+    - _Archivo: `src/__tests__/components/LoadersAndSplash.test.tsx`_
+
+- [ ] 35. Phase 5 — Visual Excellence: Statistics Screen
+  - [ ] 35.1 Implementar `StatisticsScreen` con donut chart y bar chart
+    - Crear `src/screens/statistics/StatisticsScreen.tsx`
+    - Implementar `DonutChart` con Items por tipo de Container, animación de entrada staggered
+    - Implementar `ActivityBarChart` con Items por día (últimos 7 días), barras animadas con stagger de 80ms
+    - Añadir `AnimatedCounter` para el total de Items en Display typography
+    - _Requirements: 21.1, 21.2, 21.3, 21.6, 21.7_
+
+  - [ ] 35.2 Implementar progress bars y location heat map
+    - Implementar `ProgressBarList` con los 5 Containers más llenos, animación de 800ms
+    - Implementar `LocationHeatMap` con grid de tiles coloreados por intensidad
+    - _Requirements: 21.4, 21.5_
+
+  - [ ] 35.3 Añadir Statistics tab y actualización en tiempo real
+    - Añadir Statistics como Tab 4 en `BottomTabNavigator.tsx` (ajustar tabs existentes)
+    - Implementar actualización de valores al navegar de vuelta a la pantalla
+    - _Requirements: 21.1, 21.8_
+
+  - [ ]* 35.4 Escribir property test para Statistics (Property 22)
+    - **Property 22: valores de StatisticsScreen coinciden con agregados de SQLite**
+    - **Validates: Requirements 21.6, 21.2, 21.4**
+    - _Archivo: `src/__tests__/properties/statistics.property.test.ts`_
+
+  - [ ]* 35.5 Escribir property test para AnimatedCounter (Property 18)
+    - **Property 18: AnimatedCounter alcanza exactamente el valor objetivo**
+    - **Validates: Requirements 21.6, 20.5**
+    - _Archivo: `src/__tests__/properties/statistics.property.test.ts`_
+
+  - [ ]* 35.6 Escribir tests de ejemplo para StatisticsScreen
+    - Test: donut chart visible con segmentos por tipo
+    - Test: bar chart visible con 7 barras
+    - Test: AnimatedCounter muestra valor correcto
+    - _Archivo: `src/__tests__/components/StatisticsScreen.test.tsx`_
+
+- [ ] 36. Phase 5 — Checkpoint final visual
+  - Verificar que el Splash_Screen animado se muestra y completa en ≤ 1.5s
+  - Verificar que el Dashboard muestra Hero_Section, secciones Netflix y MeshGradient
+  - Verificar que las Shared_Element_Transitions funcionan en iOS y Android
+  - Verificar que el Tab Bar tiene glassmorphism real con BlobTabIndicator
+  - Verificar que la StatisticsScreen muestra todos los charts con animaciones
+  - Verificar que los Lottie empty states se muestran correctamente
+  - Ejecutar suite completa de tests: `npx jest --passWithNoTests`
+  - Asegurarse de que todos los tests pasan; preguntar al usuario si hay dudas.
+
+---
+
+## Task Dependency Graph
+
+```json
+{
+  "waves": [
+    {
+      "wave": 1,
+      "tasks": ["1"],
+      "description": "Configuración del proyecto y estructura base"
+    },
+    {
+      "wave": 2,
+      "tasks": ["2"],
+      "description": "Sistema de tipos TypeScript",
+      "dependsOn": ["1"]
+    },
+    {
+      "wave": 3,
+      "tasks": ["3"],
+      "description": "Theme Engine",
+      "dependsOn": ["2"]
+    },
+    {
+      "wave": 4,
+      "tasks": ["4"],
+      "description": "Base de datos SQLite — schema y migraciones",
+      "dependsOn": ["3"]
+    },
+    {
+      "wave": 5,
+      "tasks": ["5"],
+      "description": "Repositorios de datos",
+      "dependsOn": ["4"]
+    },
+    {
+      "wave": 6,
+      "tasks": ["6"],
+      "description": "Validaciones y utilidades",
+      "dependsOn": ["5"]
+    },
+    {
+      "wave": 7,
+      "tasks": ["7"],
+      "description": "Stores Zustand",
+      "dependsOn": ["6"]
+    },
+    {
+      "wave": 8,
+      "tasks": ["8"],
+      "description": "Navegación skeleton",
+      "dependsOn": ["7"]
+    },
+    {
+      "wave": 9,
+      "tasks": ["9"],
+      "description": "Onboarding",
+      "dependsOn": ["8"]
+    },
+    {
+      "wave": 10,
+      "tasks": ["10"],
+      "description": "Phase 1 — Checkpoint",
+      "dependsOn": ["9"]
+    },
+    {
+      "wave": 11,
+      "tasks": ["11"],
+      "description": "Componentes UI primitivos",
+      "dependsOn": ["10"]
+    },
+    {
+      "wave": 12,
+      "tasks": ["12"],
+      "description": "Dashboard",
+      "dependsOn": ["11"]
+    },
+    {
+      "wave": 13,
+      "tasks": ["13"],
+      "description": "Gestión de Containers",
+      "dependsOn": ["12"]
+    },
+    {
+      "wave": 14,
+      "tasks": ["14"],
+      "description": "Gestión de Items",
+      "dependsOn": ["13"]
+    },
+    {
+      "wave": 15,
+      "tasks": ["15"],
+      "description": "Camera Module",
+      "dependsOn": ["14"]
+    },
+    {
+      "wave": 16,
+      "tasks": ["16"],
+      "description": "Phase 2 — Checkpoint",
+      "dependsOn": ["15"]
+    },
+    {
+      "wave": 17,
+      "tasks": ["17", "18", "19"],
+      "description": "Search Engine, Sistema de Tags, Gestión de Ubicaciones (paralelo)",
+      "dependsOn": ["16"]
+    },
+    {
+      "wave": 18,
+      "tasks": ["20"],
+      "description": "Phase 3 — Checkpoint",
+      "dependsOn": ["17", "18", "19"]
+    },
+    {
+      "wave": 19,
+      "tasks": ["21", "22", "23", "24"],
+      "description": "Animaciones, Accesibilidad, Export Module, Rendimiento (paralelo)",
+      "dependsOn": ["20"]
+    },
+    {
+      "wave": 20,
+      "tasks": ["25"],
+      "description": "Phase 4 — Checkpoint final",
+      "dependsOn": ["21", "22", "23", "24"]
+    },
+    {
+      "wave": 21,
+      "tasks": ["26", "27", "28"],
+      "description": "Phase 5 — Tokens de tema, hooks de animación y componentes visuales nuevos (paralelo)",
+      "dependsOn": ["25"]
+    },
+    {
+      "wave": 22,
+      "tasks": ["29", "30", "31", "32", "33", "34", "35"],
+      "description": "Phase 5 — PosterCard expandida, Dashboard, Transiciones, Microinteracciones, Glassmorphism, Loaders, Statistics (paralelo)",
+      "dependsOn": ["26", "27", "28"]
+    },
+    {
+      "wave": 23,
+      "tasks": ["36"],
+      "description": "Phase 5 — Checkpoint final visual",
+      "dependsOn": ["29", "30", "31", "32", "33", "34", "35"]
+    }
+  ]
+}
+```
+
 ---
 
 ## Notes
@@ -588,4 +992,7 @@ Plan de implementación incremental para San Alejo, una app móvil de organizaci
 - Los tests de ejemplo usan Jest + React Native Testing Library
 - La DB de test usa `expo-sqlite` in-memory para aislamiento
 - El lenguaje de implementación es **TypeScript** (strict mode) en todo el proyecto
-- Las Properties 1–16 del documento de diseño están cubiertas por las tareas de property testing
+- Las Properties 1–16 del documento de diseño están cubiertas por las tareas de property testing (fases 1–4)
+- Las Properties 17–22 del documento de diseño están cubiertas por las tareas de la Phase 5 (tareas 27.4, 28.6, 28.7, 35.4, 35.5)
+- Las tareas 26–36 implementan los requisitos visuales 18–27 añadidos en la expansión del documento de requisitos
+- La Phase 5 (tareas 26–36) depende de la Phase 4 completada (tarea 25) y puede comenzarse una vez superado ese checkpoint

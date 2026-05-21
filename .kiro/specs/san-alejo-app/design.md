@@ -25,6 +25,13 @@ San Alejo es una aplicación móvil de organización del hogar con una interfaz 
 | Imágenes | Expo Image Picker + Expo File System |
 | Exportación | Expo File System + Expo Sharing |
 | Gestos | React Native Gesture Handler |
+| Animaciones Lottie | `lottie-react-native` |
+| Glassmorphism real | `expo-blur` |
+| Gradientes | `expo-linear-gradient` |
+| Tipografía variable | `@expo-google-fonts/inter` |
+| Color dominante | Utilidad personalizada `useDominantColor` |
+| Splash animado | `expo-splash-screen` |
+
 
 ---
 
@@ -73,7 +80,8 @@ Bottom Tab Bar
 │   └── ItemDetailScreen (bottom sheet)
 ├── Tab 2: SearchScreen
 ├── Tab 3: LocationsScreen
-└── Tab 4: SettingsScreen
+├── Tab 4: StatisticsScreen
+└── Tab 5: SettingsScreen
 
 Modals (presentados sobre cualquier tab)
 ├── CreateContainerModal
@@ -85,6 +93,7 @@ Modals (presentados sobre cualquier tab)
 Onboarding (Stack independiente, solo primer lanzamiento)
 └── OnboardingScreen (3 slides)
 ```
+
 
 ---
 
@@ -104,6 +113,7 @@ Onboarding (Stack independiente, solo primer lanzamiento)
 │   ├── containers/
 │   ├── items/
 │   ├── search/
+│   ├── statistics/
 │   ├── settings/
 │   └── onboarding/
 ├── navigation/
@@ -129,7 +139,10 @@ Onboarding (Stack independiente, solo primer lanzamiento)
 │   ├── useContainers.ts
 │   ├── useItems.ts
 │   ├── useSearch.ts
-│   └── useCamera.ts
+│   ├── useCamera.ts
+│   ├── useDominantColor.ts
+│   ├── useAnimatedCounter.ts
+│   └── useParallax.ts
 ├── utils/
 │   ├── uuid.ts
 │   ├── dateUtils.ts
@@ -141,6 +154,8 @@ Onboarding (Stack independiente, solo primer lanzamiento)
 │   ├── spacing.ts
 │   ├── shadows.ts
 │   ├── animations.ts
+│   ├── gradients.ts
+│   ├── glassmorphism.ts
 │   └── index.ts
 └── types/
     ├── Container.ts
@@ -150,6 +165,7 @@ Onboarding (Stack independiente, solo primer lanzamiento)
     └── common.ts
 ```
 
+
 ### Componentes UI primitivos (`components/ui`)
 
 #### GlassCard
@@ -158,6 +174,7 @@ interface GlassCardProps {
   blur?: number;                  // default: 20
   borderOpacity?: number;         // default: 0.1
   backgroundOpacity?: number;     // default: 0.05
+  level?: GlassmorphismLevel;     // 'ultra-light' | 'light' | 'medium' | 'heavy'
   children: React.ReactNode;
   style?: StyleProp<ViewStyle>;
 }
@@ -174,6 +191,9 @@ interface PosterCardProps {
   containerType?: ContainerType;
   onPress: () => void;
   onLongPress?: () => void;
+  showRibbon?: boolean;           // muestra RibbonBadge si true
+  dominantColor?: string;         // hex para gradiente dinámico
+  featured?: boolean;             // aplica Gradient_Border si true
 }
 ```
 
@@ -213,6 +233,7 @@ interface FABProps {
   icon: string;                   // Ionicons name
   label?: string;
   position?: 'bottom-right' | 'bottom-center';
+  radialMenu?: FABRadialMenuOption[];  // hasta 4 opciones
 }
 ```
 
@@ -230,7 +251,7 @@ interface SearchBarProps {
 #### EmptyState
 ```typescript
 interface EmptyStateProps {
-  illustration: React.ReactNode;
+  lottieSource: object;           // Lottie JSON asset
   title: string;
   subtitle?: string;
   ctaLabel?: string;
@@ -255,6 +276,113 @@ interface HapticButtonProps extends PressableProps {
   children: React.ReactNode;
 }
 ```
+
+
+#### AnimatedCounter
+```typescript
+interface AnimatedCounterProps {
+  value: number;
+  duration?: number;              // default 800ms
+  prefix?: string;
+  suffix?: string;
+  style?: TextStyle;
+}
+```
+
+#### GradientBorder
+```typescript
+interface GradientBorderProps {
+  colors: string[];               // colores del gradiente
+  borderWidth?: number;           // default 1.5
+  borderRadius?: number;
+  children: React.ReactNode;
+}
+```
+
+#### GlowContainer
+```typescript
+interface GlowContainerProps {
+  glowColor: string;
+  glowIntensity?: number;         // 0-1, default 0.4
+  children: React.ReactNode;
+}
+```
+
+#### RibbonBadge
+```typescript
+interface RibbonBadgeProps {
+  text: string;
+  colors?: string[];              // default brand gradient
+}
+```
+
+#### MeshGradientBackground
+```typescript
+interface MeshGradientBackgroundProps {
+  colors: string[];
+  cycleDuration?: number;         // default 8000ms
+  style?: ViewStyle;
+}
+```
+
+#### BlobTabIndicator
+```typescript
+interface BlobTabIndicatorProps {
+  activeIndex: number;
+  tabCount: number;
+  tabWidth: number;
+}
+```
+
+#### FABRadialMenu
+```typescript
+interface FABRadialMenuOption {
+  icon: string;
+  label: string;
+  onPress: () => void;
+  color?: string;
+}
+
+interface FABRadialMenuProps {
+  options: FABRadialMenuOption[]; // máximo 4
+  mainIcon: string;
+  onMainPress?: () => void;
+}
+```
+
+#### HeroCarousel
+```typescript
+interface HeroCarouselProps {
+  containers: Container[];
+  autoPlayInterval?: number;      // default 5000ms
+  onContainerPress: (container: Container) => void;
+}
+```
+
+#### ParallaxScrollView
+```typescript
+interface ParallaxScrollViewProps {
+  headerImage: string | null;
+  headerHeight: number;
+  parallaxFactor?: number;        // default 0.6
+  children: React.ReactNode;
+}
+```
+
+### Componentes de la pantalla de Estadísticas (`screens/statistics`)
+
+#### DonutChart
+Gráfico de dona que muestra Items agrupados por tipo de Container. Cada segmento usa la paleta de colores expandida. Incluye `AnimatedCounter` en el centro con el total.
+
+#### ActivityBarChart
+Gráfico de barras que muestra Items añadidos por día en los últimos 7 días. Las barras se animan desde altura 0 con un stagger de 80ms por barra.
+
+#### ProgressBarList
+Lista de los 5 Containers más llenos como barras de progreso animadas que se llenan desde 0% hasta el porcentaje real en 800ms.
+
+#### LocationHeatMap
+Mapa de calor de Locations en formato grid. Cada tile se colorea con un gradiente de intensidad basado en el total de Items en esa Location.
+
 
 ### Interfaces de los Stores (Zustand)
 
@@ -316,6 +444,9 @@ interface IContainerRepository {
   delete(id: string): Promise<void>;           // cascading
   countItems(id: string): Promise<number>;     // includes nested
   search(query: string): Promise<Container[]>;
+  getStatsByType(): Promise<Record<ContainerType, number>>;
+  getDailyItemCounts(days: number): Promise<{ date: string; count: number }[]>;
+  getTopFilledContainers(limit: number): Promise<{ container: Container; count: number }[]>;
 }
 ```
 
@@ -329,8 +460,41 @@ interface IItemRepository {
   delete(id: string): Promise<void>;
   move(id: string, newContainerId: string): Promise<void>;
   search(query: string): Promise<Item[]>;
+  getTotalCount(): Promise<number>;
 }
 ```
+
+### Hooks personalizados
+
+#### useDominantColor
+```typescript
+// hooks/useDominantColor.ts
+function useDominantColor(imageUri: string | null): string | null;
+// Extrae el color dominante de una imagen mediante muestreo de píxeles.
+// Retorna un string hexadecimal '#RRGGBB' o null si no hay imagen.
+```
+
+#### useAnimatedCounter
+```typescript
+// hooks/useAnimatedCounter.ts
+function useAnimatedCounter(
+  targetValue: number,
+  duration?: number,   // default 800ms
+  easing?: EasingFunction
+): Animated.SharedValue<number>;
+// Retorna un SharedValue de Reanimated que anima de 0 a targetValue.
+```
+
+#### useParallax
+```typescript
+// hooks/useParallax.ts
+function useParallax(
+  scrollY: Animated.SharedValue<number>,
+  factor?: number      // default 0.6
+): Animated.DerivedValue<number>;
+// Retorna un DerivedValue = scrollY * factor, limitado a headerHeight.
+```
+
 
 ---
 
@@ -343,6 +507,7 @@ interface IItemRepository {
 export type UUID = string;
 export type UnixTimestamp = number;
 export type ContainerType = 'box' | 'suitcase' | 'drawer' | 'shelf' | 'bag' | 'other';
+export type GlassmorphismLevel = 'ultra-light' | 'light' | 'medium' | 'heavy';
 
 // types/Location.ts
 export interface Location {
@@ -371,6 +536,7 @@ export interface Container {
   color_tag?: string;
   created_at: UnixTimestamp;
   updated_at: UnixTimestamp;
+  last_accessed_at?: UnixTimestamp;
   // Relaciones cargadas bajo demanda
   location?: Location;
   tags?: Tag[];
@@ -417,6 +583,45 @@ export interface CreateItemInput {
 export type UpdateItemInput = Partial<Omit<CreateItemInput, 'container_id'>>;
 ```
 
+### Tokens del Theme Engine
+
+#### theme/gradients.ts
+```typescript
+export const Gradients = {
+  brand: ['#6C63FF', '#FF6584'],
+  brandOverlay: ['rgba(108,99,255,0.6)', 'rgba(255,101,132,0.6)'],
+  meshStops: ['#0A0A0F', 'rgba(108,99,255,0.15)', 'rgba(255,101,132,0.10)'],
+  vignette: ['transparent', 'rgba(0,0,0,0.6)'],
+  cardBottom: ['transparent', 'rgba(0,0,0,0.85)'],
+  shimmer: [
+    'rgba(255,255,255,0.0)',
+    'rgba(255,255,255,0.08)',
+    'rgba(255,255,255,0.0)',
+  ],
+  heatMapLow: 'rgba(108,99,255,0.1)',
+  heatMapHigh: 'rgba(108,99,255,0.9)',
+};
+```
+
+#### theme/glassmorphism.ts
+```typescript
+export type GlassmorphismLevel = 'ultra-light' | 'light' | 'medium' | 'heavy';
+
+export interface GlassmorphismConfig {
+  backgroundOpacity: number;   // [0, 1]
+  borderOpacity: number;       // [0, 1]
+  blurRadius: number;          // > 0, en px
+}
+
+export const GlassmorphismLevels: Record<GlassmorphismLevel, GlassmorphismConfig> = {
+  'ultra-light': { backgroundOpacity: 0.02, borderOpacity: 0.06, blurRadius: 10 },
+  'light':       { backgroundOpacity: 0.05, borderOpacity: 0.10, blurRadius: 20 },
+  'medium':      { backgroundOpacity: 0.10, borderOpacity: 0.15, blurRadius: 30 },
+  'heavy':       { backgroundOpacity: 0.20, borderOpacity: 0.25, blurRadius: 40 },
+};
+```
+
+
 ### Esquema SQLite
 
 ```sql
@@ -439,7 +644,8 @@ CREATE TABLE IF NOT EXISTS containers (
   cover_image_uri      TEXT,
   color_tag            TEXT,
   created_at           INTEGER NOT NULL,
-  updated_at           INTEGER NOT NULL
+  updated_at           INTEGER NOT NULL,
+  last_accessed_at     INTEGER
 );
 
 -- items
@@ -480,7 +686,7 @@ CREATE TABLE IF NOT EXISTS item_tags (
 
 ```typescript
 interface ExportSchema {
-  version: number;           // versión del esquema de exportación
+  version: number;
   exported_at: UnixTimestamp;
   locations: Location[];
   tags: Tag[];
@@ -491,7 +697,6 @@ interface ExportSchema {
 }
 
 interface ContainerExport extends Container {
-  // cover_image_uri apunta a URI local; en exportación se omite o se incluye como base64
   cover_image_data?: string;  // base64 opcional
 }
 
@@ -512,6 +717,7 @@ interface Migration {
 // La tabla `_migrations` registra las versiones aplicadas:
 // CREATE TABLE _migrations (version INTEGER PRIMARY KEY, applied_at INTEGER)
 ```
+
 
 ---
 
@@ -645,9 +851,58 @@ La biblioteca de property-based testing seleccionada es **fast-check** (TypeScri
 
 ### Property 16: UI primitive components are crash-safe with invalid props
 
-*Para cualquier* combinación de props inválidos o ausentes pasados a cualquier componente primitivo del design system (`GlassCard`, `PosterCard`, `FAB`, `BottomSheet`, `SkeletonLoader`, `TagChip`, `SearchBar`, `EmptyState`, `QuantityStepper`, `HapticButton`), el componente no debe lanzar una excepción en modo producción (puede mostrar un estado degradado o vacío).
+*Para cualquier* combinación de props inválidos o ausentes pasados a cualquier componente primitivo del design system (`GlassCard`, `PosterCard`, `FAB`, `BottomSheet`, `SkeletonLoader`, `TagChip`, `SearchBar`, `EmptyState`, `QuantityStepper`, `HapticButton`, `AnimatedCounter`, `GradientBorder`, `GlowContainer`, `RibbonBadge`), el componente no debe lanzar una excepción en modo producción (puede mostrar un estado degradado o vacío).
 
 **Validates: Requirements 16.6**
+
+---
+
+### Property 17: Glassmorphism level values are within valid ranges
+
+*Para cualquier* valor de `GlassmorphismLevel` (`ultra-light`, `light`, `medium`, `heavy`), la configuración correspondiente en `GlassmorphismLevels` debe satisfacer: `backgroundOpacity` ∈ [0, 1], `borderOpacity` ∈ [0, 1], y `blurRadius` > 0. Ningún nivel puede tener valores fuera de estos rangos.
+
+**Validates: Requirements 25.1**
+
+---
+
+### Property 18: AnimatedCounter reaches exact target value
+
+*Para cualquier* entero N ≥ 0, después de que la `Count_Up_Animation` del componente `AnimatedCounter` complete su duración total, el valor mostrado debe ser exactamente igual a N. La animación puede mostrar valores intermedios durante su ejecución, pero el valor final debe coincidir con el objetivo sin redondeo ni truncamiento.
+
+**Validates: Requirements 21.6, 20.5**
+
+---
+
+### Property 19: Dominant color extraction produces valid hex color
+
+*Para cualquier* URI de imagen válida, la función de extracción de `Dominant_Color` implementada en `useDominantColor` debe retornar una cadena que coincida con el patrón `#RRGGBB`, donde cada canal (R, G, B) es un valor hexadecimal de dos dígitos en el rango [00, FF] (es decir, valores decimales en [0, 255]).
+
+**Validates: Requirements 24.1**
+
+---
+
+### Property 20: Parallax scroll factor constrains header movement
+
+*Para cualquier* offset de scroll Y ≥ 0 y cualquier factor de paralaje F ∈ (0, 1), la traslación del header calculada por `useParallax` debe ser igual a Y × F, y dicha traslación nunca debe superar la altura del header (`headerHeight`). Esta propiedad aplica tanto al Hero_Section del Dashboard (F = 0.6, Requirement 18.1) como al hero del Container Detail (F = 0.5, Requirement 27.10).
+
+**Validates: Requirements 18.1, 27.10**
+
+---
+
+### Property 21: FAB radial menu options do not exceed maximum
+
+*Para cualquier* instancia de `FABRadialMenu` configurada con N opciones donde N > 4, el componente debe renderizar exactamente 4 opciones (truncando las opciones excedentes) sin lanzar una excepción ni entrar en un estado de error. El orden de las opciones renderizadas debe corresponder a los primeros 4 elementos del array `options`.
+
+**Validates: Requirements 22.1**
+
+---
+
+### Property 22: Statistics screen values match database aggregates
+
+*Para cualquier* estado de la base de datos (conjunto arbitrario de Containers e Items con cantidades variables), todos los valores numéricos mostrados en la `Statistics_Screen` deben coincidir exactamente con los agregados calculados desde `SQLite_DB`: el total de Items mostrado como `Count_Up_Animation` debe igualar la suma de todos los campos `quantity` de todos los Items; los segmentos del donut chart deben sumar el mismo total; y el ranking de los 5 Containers más llenos debe estar ordenado de mayor a menor por conteo de Items.
+
+**Validates: Requirements 21.6, 21.2, 21.4**
+
 
 ---
 
@@ -690,6 +945,8 @@ class LocationNotFoundError extends Error { constructor(id: string) { super(`Loc
 - **Errores de operación** (fallo al guardar, fallo al borrar): Toast/Snackbar con mensaje descriptivo y opción de reintentar.
 - **Errores fatales** (DB no inicializable): pantalla de error con instrucciones para el usuario.
 - **Permisos denegados** (cámara, galería): Alert con enlace a configuración del dispositivo.
+- **Fallo en extracción de color dominante**: se usa el `color_tag` del Container como fallback; si tampoco existe, se usa el gradiente de marca.
+- **Fallo en animación Lottie**: se muestra un `EmptyState` con ilustración estática como fallback.
 
 ### Validaciones de entrada
 
@@ -722,6 +979,8 @@ export const validateExportJSON = (data: unknown): data is ExportSchema => {
 
 - Si `cover_image_uri` apunta a un archivo que ya no existe en el sistema de archivos, la UI muestra un placeholder en lugar de crashear.
 - Las imágenes se procesan en background; si el resize falla, se usa la imagen original sin resize.
+- Si la extracción de `Dominant_Color` falla (imagen corrupta, formato no soportado), se retorna `null` y el componente usa el gradiente de marca como fallback.
+
 
 ---
 
@@ -770,17 +1029,70 @@ test('Container creation round-trip', async () => {
 });
 ```
 
+```typescript
+// Ejemplo de implementación — Property 17
+import fc from 'fast-check';
+import { GlassmorphismLevels, GlassmorphismLevel } from '../../theme/glassmorphism';
+
+// Feature: san-alejo-app, Property 17: Glassmorphism level values are within valid ranges
+test('Glassmorphism level values are within valid ranges', () => {
+  fc.assert(
+    fc.property(
+      fc.constantFrom<GlassmorphismLevel>('ultra-light', 'light', 'medium', 'heavy'),
+      (level) => {
+        const config = GlassmorphismLevels[level];
+        expect(config.backgroundOpacity).toBeGreaterThanOrEqual(0);
+        expect(config.backgroundOpacity).toBeLessThanOrEqual(1);
+        expect(config.borderOpacity).toBeGreaterThanOrEqual(0);
+        expect(config.borderOpacity).toBeLessThanOrEqual(1);
+        expect(config.blurRadius).toBeGreaterThan(0);
+      }
+    ),
+    { numRuns: 100 }
+  );
+});
+```
+
+```typescript
+// Ejemplo de implementación — Property 20
+import fc from 'fast-check';
+import { computeParallaxTranslation } from '../../hooks/useParallax';
+
+// Feature: san-alejo-app, Property 20: Parallax scroll factor constrains header movement
+test('Parallax scroll factor constrains header movement', () => {
+  fc.assert(
+    fc.property(
+      fc.float({ min: 0, max: 2000 }),   // scrollY
+      fc.float({ min: 0.01, max: 0.99 }), // factor
+      fc.float({ min: 100, max: 800 }),   // headerHeight
+      (scrollY, factor, headerHeight) => {
+        const translation = computeParallaxTranslation(scrollY, factor, headerHeight);
+        expect(translation).toBeCloseTo(Math.min(scrollY * factor, headerHeight), 5);
+        expect(translation).toBeLessThanOrEqual(headerHeight);
+      }
+    ),
+    { numRuns: 100 }
+  );
+});
+```
+
 ### Tests de ejemplo (Jest + React Native Testing Library)
 
 **Casos cubiertos por tests de ejemplo:**
 - Onboarding: primer lanzamiento muestra slides, skip/complete persiste flag
-- Dashboard: empty state cuando no hay containers, FAB visible, toggle grid/list
-- Container Detail: hero header, badge de item count, sub-containers visibles
+- Dashboard: empty state con Lottie cuando no hay containers, FAB visible, toggle grid/list
+- Dashboard: Hero_Section visible, HeroCarousel rota automáticamente
+- Dashboard: secciones "Recientes", "Continuar organizando" y "Por ubicación" se renderizan
+- Container Detail: hero header con parallax, badge de item count, sub-containers visibles
 - Formularios: campos pre-poblados en edición, submit con datos válidos
-- Navegación: back button, tab switching, modal dismiss
+- Navegación: back button, tab switching, modal dismiss con spring physics
 - Cámara: action sheet con dos opciones, manejo de permiso denegado
 - Búsqueda: empty state cuando no hay resultados, sugerencias recientes
 - Exportación: share sheet se abre, error con JSON inválido
+- StatisticsScreen: donut chart visible, bar chart visible, progress bars visibles, heat map visible
+- AnimatedCounter: valor inicial 0, valor final correcto tras animación
+- HeroCarousel: rota al siguiente slide tras el intervalo configurado
+- Splash screen: se muestra al lanzar la app, desaparece tras 1.5s
 
 ### Tests de integración
 
@@ -789,12 +1101,16 @@ test('Container creation round-trip', async () => {
 - Migración: aplicar migración sobre DB con datos existentes
 - Cascading delete: verificar que sub-containers e items se eliminan
 - Export/import: ciclo completo con datos reales en DB de test
+- Statistics aggregates: `getTotalCount()`, `getStatsByType()`, `getDailyItemCounts()` retornan valores correctos
 
 ### Tests de smoke (configuración)
 
-- Verificar que todas las dependencias del stack están instaladas
+- Verificar que todas las dependencias del stack están instaladas (incluyendo `lottie-react-native`, `expo-blur`, `expo-linear-gradient`, `@expo-google-fonts/inter`, `expo-splash-screen`)
 - Verificar que el esquema SQLite tiene todas las tablas y columnas requeridas
 - Verificar que el Theme_Engine exporta todos los tokens requeridos
+- Verificar que `GlassmorphismLevels` exporta los 4 niveles con sus valores exactos
+- Verificar que `Gradients` exporta todos los gradientes definidos
+- Verificar que la Splash_Screen completa su animación en ≤ 1.5 segundos
 
 ### Organización de tests
 
@@ -807,7 +1123,9 @@ test('Container creation round-trip', async () => {
     │   ├── search.property.test.ts
     │   ├── tags.property.test.ts
     │   ├── export.property.test.ts
-    │   └── theme.property.test.ts
+    │   ├── theme.property.test.ts
+    │   ├── statistics.property.test.ts
+    │   └── animations.property.test.ts
     ├── unit/                # Jest example-based tests
     │   ├── validation.test.ts
     │   ├── repositories/
@@ -818,8 +1136,19 @@ test('Container creation round-trip', async () => {
     └── components/          # React Native Testing Library
         ├── GlassCard.test.tsx
         ├── PosterCard.test.tsx
+        ├── StatisticsScreen.test.tsx
+        ├── HeroCarousel.test.tsx
+        ├── AnimatedCounter.test.tsx
         └── ...
 ```
+
+**`statistics.property.test.ts`** cubre las Properties 18 y 22:
+- Property 18: `AnimatedCounter` alcanza exactamente el valor objetivo
+- Property 22: valores de `StatisticsScreen` coinciden con los agregados de SQLite
+
+**`animations.property.test.ts`** cubre las Properties 20 y 21:
+- Property 20: factor de paralaje limita el movimiento del header
+- Property 21: `FABRadialMenu` no renderiza más de 4 opciones
 
 ### Cobertura objetivo
 
@@ -830,7 +1159,10 @@ test('Container creation round-trip', async () => {
 | Validaciones | Property | 100% |
 | Componentes UI | Example (RNTL) | 70%+ |
 | Export/Import | Property + Integration | 95%+ |
-| Theme Engine | Property (contraste) | 100% |
+| Theme Engine | Property (contraste, glassmorphism) | 100% |
+| Statistics | Property + Example | 85%+ |
+| Animaciones (parallax, counter, FAB) | Property | 90%+ |
+| Hooks (useDominantColor, useParallax) | Property + Unit | 85%+ |
 
 ### Herramientas
 
@@ -841,3 +1173,5 @@ test('Container creation round-trip', async () => {
 | React Native Testing Library | Tests de componentes |
 | expo-sqlite (in-memory) | DB de test aislada |
 | jest-expo | Preset de Jest para Expo |
+| jest-mock (lottie-react-native) | Mock de animaciones Lottie en tests |
+| jest-mock (expo-blur) | Mock de BlurView en tests |
