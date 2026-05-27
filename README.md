@@ -340,7 +340,7 @@ Descarga la app **Expo Go** desde Google Play Store en tu teléfono Android. Est
 
 **Paso 1 — Clonar o descargar el repositorio**
 ```bash
-git clone <url-del-repositorio>
+git clone https://github.com/JuanDNeira/SanAlejoKiro.git
 cd san-alejo
 ```
 
