@@ -44,7 +44,7 @@ La tarea 14 requiere que todas las anteriores estén completas.
 
 ## Tasks
 
-- [ ] 1. Tipos TypeScript del módulo ecológico
+- [x] 1. Tipos TypeScript del módulo ecológico
   - Añadir `EcoAction` y `EcoStatus` como tipos exportados en `src/types/Item.ts`
   - Extender la interfaz `Item` con los campos opcionales: `eco_action?: EcoAction`, `eco_notes?: string`, `eco_completed_at?: UnixTimestamp`, `eco_status?: EcoStatus`
   - Extender `UpdateItemInput` con los mismos 4 campos opcionales (aceptando `null` para borrar)
@@ -52,7 +52,7 @@ La tarea 14 requiere que todas las anteriores estén completas.
   - Verificar que el código existente que usa `Item` sigue compilando sin errores TypeScript
   - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5_
 
-- [ ] 2. Migración de base de datos v4
+- [x] 2. Migración de base de datos v4
   - Añadir el nuevo token de color `accentGlow: '#003D30'` en `src/theme/colors.ts` junto a `primaryGlow`
   - Añadir la migration v4 al array `migrations` en `src/database/migrations.ts` con `version: 4`
   - La migración debe ejecutarse dentro de `db.withTransactionAsync()` para garantizar atomicidad
@@ -63,7 +63,7 @@ La tarea 14 requiere que todas las anteriores estén completas.
   - Verificar manualmente que la app arranca sin errores y que los ítems existentes conservan sus datos
   - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 1.10_
 
-- [ ] 3. EcoRepository
+- [x] 3. EcoRepository
   - Crear `src/database/repositories/EcoRepository.ts` importando `rowToItem` desde `ItemRepository`
   - Implementar `updateEcoAction(itemId, action, notes?)`: actualiza `eco_action`, `eco_notes` (NULL si notes es undefined), `eco_status='pending'` y `updated_at`
   - Implementar `completeEcoAction(itemId)`: establece `eco_status='completed'`, `eco_completed_at=now`, `updated_at=now`
@@ -77,7 +77,7 @@ La tarea 14 requiere que todas las anteriores estén completas.
   - Implementar `findAllAchievements()`: SELECT ORDER BY `unlocked_at DESC`
   - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 3.7, 3.8, 3.9, 3.10, 3.11, 3.12_
 
-- [ ] 4. useEcoStore
+- [x] 4. useEcoStore
   - Crear `src/store/ecoStore.ts` con el store Zustand siguiendo el patrón de `itemStore.ts` y `containerStore.ts`
   - Definir el estado: `ecoStats`, `pendingItems`, `completedItems`, `unclassifiedItems`, `achievements`, `isLoading`, `error`, `clearError`
   - Implementar las 5 acciones de carga (`loadEcoStats`, `loadPendingItems`, `loadUnclassifiedItems`, `loadCompletedItems`, `loadAchievements`): cada una establece `isLoading: true` al inicio y `isLoading: false` al finalizar
@@ -88,7 +88,7 @@ La tarea 14 requiere que todas las anteriores estén completas.
   - Las acciones de mutación (`assignEcoAction`, `completeEcoAction`, `skipItem`) NO modifican `isLoading`; los errores se almacenan en `error`
   - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5, 4.6, 4.7, 4.8, 4.9, 4.10, 4.11, 4.12, 4.13_
 
-- [ ] 5. Navegación — nuevas rutas y tab Eco
+- [x] 5. Navegación — nuevas rutas y tab Eco
   - Añadir las 4 nuevas rutas al union `RouteName` en `src/navigation/NavigationContext.ts`: `'EcoHub'`, `'EcoClassify'`, `'EcoItemDetail'`, `'EcoHistory'`
   - Verificar que `RouteParams` ya tiene `itemId?: string` (no requiere cambio)
   - Registrar las 4 pantallas en `renderScreen()` de `RootNavigator.tsx` usando el patrón `require()` lazy existente
@@ -99,7 +99,7 @@ La tarea 14 requiere que todas las anteriores estén completas.
   - Verificar que los tabs "Inicio" y "Panel" siguen funcionando sin cambios
   - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5, 5.6, 5.7, 6.1, 6.2, 6.3_
 
-- [ ] 6. EcoHubScreen — pantalla principal del módulo
+- [x] 6. EcoHubScreen — pantalla principal del módulo
   - Crear `src/screens/EcoHubScreen.tsx`
   - Al montar, llamar `Promise.all([loadEcoStats(), loadPendingItems(), loadAchievements()])`
   - Mientras `isLoading`, mostrar `SkeletonLoader` en el área de contenido
@@ -127,7 +127,7 @@ La tarea 14 requiere que todas las anteriores estén completas.
   - Cuando `currentIndex >= unclassifiedItems.length`: mostrar pantalla de resumen con "Clasificaste N ítems" y botón "Finalizar" que llama `goBack()`
   - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.5, 8.6, 8.7, 8.8, 8.9_
 
-- [ ] 8. EcoItemDetailScreen — detalle y edición de acción ecológica
+- [x] 8. EcoItemDetailScreen — detalle y edición de acción ecológica
   - Crear `src/screens/EcoItemDetailScreen.tsx`
   - Leer `itemId` desde `params?.itemId`; si está vacío o el ítem no existe, mostrar estado de error "Ítem no encontrado" con botón "Volver a Eco" que navega a `EcoHub`
   - Al montar, cargar el ítem con `ItemRepository.findById(itemId)` e inicializar estado local `selectedAction` y `notes`
@@ -140,7 +140,7 @@ La tarea 14 requiere que todas las anteriores estén completas.
   - Ícono de la acción actual con `Colors.accent`; si `eco_action` es null, mostrar `help-circle-outline` con `Colors.textTertiary`
   - _Requirements: 9.1, 9.2, 9.3, 9.4, 9.5, 9.6, 9.7, 9.8_
 
-- [ ] 9. EcoHistoryScreen — historial de acciones completadas
+- [x] 9. EcoHistoryScreen — historial de acciones completadas
   - Crear `src/screens/EcoHistoryScreen.tsx`
   - Al montar, llamar `loadCompletedItems()`
   - Mientras `isLoading`, mostrar `SkeletonLoader`
@@ -150,14 +150,14 @@ La tarea 14 requiere que todas las anteriores estén completas.
   - Botón de retroceso en el encabezado que llama `goBack()`
   - _Requirements: 10.1, 10.2, 10.3, 10.4, 10.5_
 
-- [ ] 10. Integración en ContainerDetailScreen
+- [-] 10. Integración en ContainerDetailScreen
   - En el componente `ItemCard` de `ContainerDetailScreen.tsx`, añadir un badge eco: ícono de `ECO_ACTION_ICONS[item.eco_action]` con `Colors.accent`, posicionado en la esquina superior derecha del thumbnail/iconWrapper, visible solo cuando `item.eco_action !== null`
   - Ampliar `handleLongPress` en `ItemCard` para incluir la opción "Acción ecológica" en el `Alert.alert`, que al pulsarse navega a `'EcoItemDetail'` con `{ itemId: item.id }`
   - Mantener la opción "Eliminar" existente en el mismo menú contextual
   - Verificar que el long-press sigue funcionando con el mismo delay de 400ms y haptic `ImpactFeedbackStyle.Medium`
   - _Requirements: 11.1, 11.2, 11.3_
 
-- [ ] 11. Integración en CreateItemScreen
+- [-] 11. Integración en CreateItemScreen
   - Añadir estado local `ecoExpanded: boolean` (false por defecto) y `selectedEcoAction: EcoAction | undefined` en `CreateItemScreen.tsx`
   - Añadir al final del formulario (antes del `bottomSpacer`) un `TouchableOpacity` colapsable con ícono `leaf-outline`, etiqueta "Acción ecológica (opcional)" y chevron up/down; al pulsar, alternar `ecoExpanded` con haptic `selectionAsync`
   - Cuando `ecoExpanded === true`, mostrar un grid de 6 chips de acción ecológica (ícono + etiqueta); el chip seleccionado usa `Colors.accent` y `Colors.accentGlow`
@@ -165,7 +165,7 @@ La tarea 14 requiere que todas las anteriores estén completas.
   - Verificar que el formulario existente (nombre, descripción, cantidad, tags) sigue funcionando sin cambios
   - _Requirements: 12.1, 12.2, 12.3_
 
-- [ ] 12. Integración en SearchScreen
+- [-] 12. Integración en SearchScreen
   - Añadir estado local `activeEcoFilter: EcoAction | 'unclassified' | null` (null por defecto) en `SearchScreen.tsx`
   - Añadir una segunda fila de chips de filtro debajo de los filtros existentes, visible cuando `activeFilter === 'all'` o `activeFilter === 'items'`
   - Los chips eco incluyen: "Sin clasificar" (ícono `help-circle-outline`) + los 6 valores de `EcoAction` con sus íconos y etiquetas en español
