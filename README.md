@@ -745,6 +745,16 @@ CREATE TABLE eco_achievements (
   metadata    TEXT
 );
 ```
+### Captura de Pantalla 
+
+<img width="610" height="1356" alt="WhatsApp Image 2026-05-28 at 6 52 21 PM" src="https://github.com/user-attachments/assets/d7e52445-8ba7-441a-834d-92c4505c630b" />
+
+<img width="610" height="1356" alt="WhatsApp Image 2026-05-28 at 6 52 21 PM (1)" src="https://github.com/user-attachments/assets/5d319a1c-87d1-4487-bd43-fe8eb028a201" />
+
+<img width="610" height="1356" alt="WhatsApp Image 2026-05-28 at 6 52 21 PM (2)" src="https://github.com/user-attachments/assets/f0f07bb7-9942-40a8-979e-972af73005ad" />
+
+<img width="610" height="1356" alt="WhatsApp Image 2026-05-28 at 6 52 21 PM (3)" src="https://github.com/user-attachments/assets/807c9c57-775b-49ba-b613-1a5989999611" />
+
 
 ---
 
